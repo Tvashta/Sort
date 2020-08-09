@@ -1,27 +1,28 @@
 import React, { useState } from "react";
 import Sketch from "react-p5";
 import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
-import RangeSlider from "react-bootstrap-range-slider";
+// import RangeSlider from "react-bootstrap-range-slider";
 import { Button, Nav, Navbar, NavDropdown } from "react-bootstrap";
 var arr = [];
-var start = false;
-var strokewt = 10;
-var fast = 10;
-var length = 0;
-var j = 0,
-  i = 0;
-var sortAlg = 0;
-var m = 0;
+var strokewt = 10,
+  fast = 10,
+  length = 0,
+  j = 0,
+  i = 0,
+  m = 0,
+  sortAlg = 0;
 function App() {
   // const [value, setValue] = useState(0);
   const [f, setF] = useState(true);
+  const [startSort, setStart] = useState(false);
+
   function shuffle() {
     for (let i = arr.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
       if (arr[i] !== undefined && arr[j] !== undefined)
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        arr[i] = [arr[j], (arr[j] = arr[i])][0];
     }
-    start = false;
+    setStart(false);
     setF(true);
   }
 
@@ -34,7 +35,7 @@ function App() {
     if (i < length) {
       if (j < length) {
         if (arr[i] < arr[j]) {
-          arr[j] = [arr[i], (arr[i] = arr[j])][0];
+          arr[i] = [arr[j], (arr[j] = arr[i])][0];
         }
         j++;
       } else {
@@ -42,7 +43,7 @@ function App() {
         i += 1;
       }
     } else {
-      start = false;
+      setStart(false);
       setF(true);
     }
   }
@@ -74,7 +75,7 @@ function App() {
         heapify(0, i);
         i -= 1;
       } else {
-        start = false;
+        setStart(false);
         setF(true);
       }
     }
@@ -98,7 +99,7 @@ function App() {
         j = i + 1;
       }
     } else {
-      start = false;
+      setStart(false);
       setF(true);
     }
   }
@@ -121,9 +122,73 @@ function App() {
         m = arr[i];
       }
     } else {
-      start = false;
+      setStart(false);
       setF(true);
     }
+  }
+
+  function mergeSort() {
+    let copy = arr.slice();
+    mergeSortSlice(copy, 0, copy.length);
+    return;
+  }
+
+  async function mergeSortSlice(a, start, end) {
+    if (end - start <= 1) return;
+    var mid = Math.round((end + start) / 2);
+    await mergeSortSlice(a, start, mid);
+    await mergeSortSlice(a, mid, end);
+    let i = start,
+      j = mid;
+    while (i < end && j < end) {
+      if (a[i] > a[j]) {
+        let t = a[j];
+        a.splice(j, 1);
+        a.splice(i, 0, t);
+        j++;
+      }
+      i++;
+      if (i === j) j++;
+      arr = a.slice();
+      await sleep(50);
+    }
+    if (start === 0 && end === a.length) {
+      await sleep(2000);
+      setStart(false);
+    }
+  }
+
+  async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function quickSort(arr, start, end) {
+    if (start >= end) {
+      return;
+    }
+    let p = await partition(arr, start, end);
+    await Promise.all([
+      quickSort(arr, start, p - 1),
+      quickSort(arr, p + 1, end),
+    ]);
+  }
+
+  async function partition(arr, start, end) {
+    let pi = start;
+    let val = arr[end];
+    for (let i = start; i < end; i++) {
+      if (arr[i] < val) {
+        await swap(arr, i, pi);
+        pi++;
+      }
+    }
+    await swap(arr, pi, end);
+    return pi;
+  }
+
+  async function swap(arr, a, b) {
+    await sleep(50);
+    arr[a] = [arr[b], (arr[b] = arr[a])][0];
   }
 
   function sorting() {
@@ -139,6 +204,12 @@ function App() {
         break;
       case 3:
         heapSort();
+        break;
+      case 4:
+        mergeSort();
+        break;
+      case 5:
+        quickSort(arr, 0, arr.length - 1);
         break;
       default:
         break;
@@ -173,12 +244,18 @@ function App() {
             <NavDropdown.Item onClick={() => (sortAlg = 3)}>
               Heap Sort
             </NavDropdown.Item>
+            <NavDropdown.Item onClick={() => (sortAlg = 4)}>
+              Merge Sort
+            </NavDropdown.Item>
+            <NavDropdown.Item onClick={() => (sortAlg = 5)}>
+              Quick Sort
+            </NavDropdown.Item>
           </NavDropdown>
         </Nav>
         <Button
           variant="outline-danger"
           size="lg"
-          onClick={() => (start = true)}
+          onClick={() => setStart(true)}
         >
           Sort!
         </Button>
@@ -196,15 +273,18 @@ function App() {
             length = Math.ceil(arr.length / strokewt) * 10;
             p5.colorMode(p5.HSL, 360);
             var stw = 100;
-            if (start === true) {
+            if (startSort === true) {
               sorting();
+              if (sortAlg === 4 || sortAlg === 5) setStart(false);
             }
 
             for (let hue = 0; hue < length; hue++) {
-              p5.strokeWeight(strokewt);
-              p5.stroke(arr[hue], 255, 200);
-              p5.line(stw, 0, stw, 400);
-              stw += strokewt;
+              if (arr[hue] !== undefined) {
+                p5.strokeWeight(strokewt);
+                p5.stroke(arr[hue], 255, 200);
+                p5.line(stw, 0, stw, 400);
+                stw += strokewt;
+              }
             }
             for (let k = length; k < arr.length; k++) {
               p5.strokeWeight(strokewt);
