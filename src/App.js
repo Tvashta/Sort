@@ -11,7 +11,8 @@ import {
   heapSort,
   mergeSort,
   radix,
-  quickSort
+  quickSort,
+  shellSort
 } from './components/Sort'
 var arr = []
 var sortAlg = 0
@@ -48,6 +49,9 @@ function App () {
         break
       case 6:
         await radix(arr)
+        break
+      case 7:
+        await shellSort(arr)
         break
       default:
         break
@@ -92,6 +96,9 @@ function App () {
             </NavDropdown.Item>
             <NavDropdown.Item onClick={() => (sortAlg = 6)}>
               Radix Sort
+            </NavDropdown.Item>
+            <NavDropdown.Item onClick={() => (sortAlg = 7)}>
+              Shell Sort
             </NavDropdown.Item>
           </NavDropdown>
         </Nav>
