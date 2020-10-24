@@ -14,3 +14,48 @@ code {
 .sort{
   margin: 100px;
 }
+.margin{
+  margin-left: 2%;
+}
+.sideBar{
+ background-color: #343A40;
+ color: white;
+  position: fixed;
+  left: 0;
+  height: 100%;
+  width: 320px;
+  
+}
+img{
+  filter: invert(100%);
+}
+.white-color{
+  color:white
+}
+
+.sideElement{
+  font-size: x-large;
+   display: block;
+   line-height: 60px;
+   color: white;
+   padding-left: 20px;
+   box-sizing: border-box;
+   transition: 0.5s;
+   transition-property: background;
+}
+
+.sideElement:hover{
+  background: #19B3D3;
+}
+
+.open{
+  left: -250px;
+}
+
+.sideBar.open p{
+  margin-left: 77%;
+} 
+
+.sideBar.open span{
+  display: none;
+}
