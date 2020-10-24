@@ -144,3 +144,24 @@ export async function radix (arr) {
     m = Math.floor(m / 10)
   }
 }
+
+//Shell Sort
+export async function shellSort(arr){
+  let length = arr.length
+  let gap = Math.floor(length/2)
+    while (gap > 0){
+      await sleep(100);
+      for(let i=gap;i<length;i++){
+        let x=arr[i]
+        let j=i
+        while(j>=gap && arr[j-gap]>x){
+          await sleep(20)
+          arr[j]=arr[j-gap]
+          j-=gap
+        }
+        await sleep(20)
+        arr[j]=x
+      }
+      gap=Math.floor(gap/2)
+    }
+}

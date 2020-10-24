@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Sketch from 'react-p5'
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css'
 // import RangeSlider from "react-bootstrap-range-slider";
-import { Button, Nav, Navbar, NavDropdown } from 'react-bootstrap'
+import { Button, Nav, Navbar} from 'react-bootstrap'
 import Shuffle from './components/Shuffle'
 import {
   bubbleSort,
@@ -11,18 +11,28 @@ import {
   heapSort,
   mergeSort,
   radix,
-  quickSort
+  quickSort,
+  shellSort
 } from './components/Sort'
+import HamburgerMenu from 'react-hamburger-menu'
+import SideBar from './components/Sidebar'
+
 var arr = []
-var sortAlg = 0
 var strokewt = 10
 function App () {
   // const [value, setValue] = useState(0);
   const [f, setF] = useState(true)
   const [startSort, setStart] = useState(false)
+  const [isMenuOpen, menuToggle]=useState(false)
+  const [sortAlg, setSortAlg]=useState(0)
   function shuffle () {
     if (f) Shuffle(arr)
     setStart(false)
+  }
+  
+  function handleClick(i){
+    setSortAlg(i)
+    menuToggle(false)
   }
 
   async function sorting () {
@@ -49,6 +59,9 @@ function App () {
       case 6:
         await radix(arr)
         break
+      case 7:
+        await shellSort(arr)
+        break
       default:
         break
     }
@@ -59,8 +72,21 @@ function App () {
   return (
     <div>
       <Navbar bg='dark' variant='dark'>
-        <Navbar.Brand>Sorting Visualizer</Navbar.Brand>
+       <HamburgerMenu
+          isOpen={isMenuOpen}
+          menuClicked={()=>menuToggle(!isMenuOpen)}
+          width={30}
+          height={20}
+          strokeWidth={2}
+          rotate={0}
+          color='white'
+          borderRadius={0}
+          animationDuration={0.5}
+          id="menu"
+        /> 
+        <Navbar.Brand className="margin">Sorting</Navbar.Brand>
         <Nav className='mr-auto'>
+        
           <Nav.Link onClick={shuffle}>Shuffle</Nav.Link>
           {/* <RangeSlider
             value={value}
@@ -71,29 +97,7 @@ function App () {
               strokewt = e.target.value * 10
             }}
           ></RangeSlider> */}
-          <NavDropdown title='Algorithm' id='basic-nav-dropdown'>
-            <NavDropdown.Item onClick={() => (sortAlg = 0)}>
-              BubbleSort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 1)}>
-              Selection Sort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 2)}>
-              Insertion Sort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 3)}>
-              Heap Sort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 4)}>
-              Merge Sort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 5)}>
-              Quick Sort
-            </NavDropdown.Item>
-            <NavDropdown.Item onClick={() => (sortAlg = 6)}>
-              Radix Sort
-            </NavDropdown.Item>
-          </NavDropdown>
+          
         </Nav>
         <Button
           variant='outline-danger'
@@ -103,11 +107,13 @@ function App () {
           Sort!
         </Button>
       </Navbar>
-
-      <div className='sort'>
+      <SideBar open={isMenuOpen} handleClick={handleClick}/> 
+      
+<div className='sort'>
+      
         <Sketch
           setup={(p5, parent) => {
-            p5.createCanvas(1200, 400).parent(parent)
+            p5.createCanvas(1000, 400).parent(parent)
             for (let i = 190; i < 290; i += Math.floor(strokewt / 10))
               arr.push(i)
             shuffle()
@@ -136,6 +142,10 @@ function App () {
           }}
         />
       </div>
+          
+
+     
+      
     </div>
   )
 }
